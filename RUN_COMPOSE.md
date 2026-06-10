@@ -13,7 +13,15 @@ cd FIT4110_lab05_docker_compose_readiness
 
 ---
 
-## 2. Cài dependencies cho Newman/Prism/Spectral (tuỳ chọn)
+## 2. Cài dependencies cho Newman/Prism/Spectral
+
+Khuyến nghị dùng `pnpm` nếu đã cài:
+
+```bash
+pnpm install
+```
+
+Nếu máy chưa có `pnpm`, dùng `npm`:
 
 ```bash
 npm install
@@ -53,7 +61,7 @@ curl http://localhost:8000/health
 curl http://localhost:9000/health
 
 # DB readiness
-docker exec -it fit4110-db-lab05 pg_isready -U $POSTGRES_USER
+docker exec -it fit4110-db-lab05 pg_isready -U lab05 -d iotdb
 ```
 
 Bạn cũng có thể truy cập endpoint `/predict` của AI service để xem kết quả mẫu:
@@ -65,6 +73,14 @@ curl -X POST http://localhost:9000/predict
 ---
 
 ## 4. Chạy Newman test trên stack Compose (tuỳ chọn)
+
+Với `pnpm`:
+
+```bash
+pnpm run test:compose
+```
+
+Hoặc với `npm`:
 
 ```bash
 npm run test:compose
@@ -103,6 +119,7 @@ Bạn có thể dùng Makefile:
 make compose-up
 make compose-down
 make logs
+make test-compose
 ```
 
 ---

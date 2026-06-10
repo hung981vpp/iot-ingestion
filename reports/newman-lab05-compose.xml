@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="FIT4110 Lab05 Compose Smoke Tests" tests="5" time="0.085">
+  <testsuite name="API health" id="e1e0a60c-35cd-443d-902b-bb7cdd23a737" timestamp="2026-06-10T03:14:29.238Z" tests="5" failures="0" errors="0" time="0.052">
+    <testcase name="API health returns 200" time="0.052" classname="ApiHealth"/>
+    <testcase name="API status is ok" time="0.052" classname="ApiHealth"/>
+    <testcase name="API service name is iot-ingestion" time="0.052" classname="ApiHealth"/>
+    <testcase name="API version is 0.5.0" time="0.052" classname="ApiHealth"/>
+    <testcase name="API health response is JSON" time="0.052" classname="ApiHealth"/>
+  </testsuite>
+  <testsuite name="AI health" id="094af112-de82-4a33-ad78-0040570d0ed6" timestamp="2026-06-10T03:14:29.238Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="AI health returns 200" time="0.011" classname="AiHealth"/>
+    <testcase name="AI status is ok" time="0.011" classname="AiHealth"/>
+    <testcase name="AI service name is ai-service" time="0.011" classname="AiHealth"/>
+    <testcase name="AI version is 0.5.0" time="0.011" classname="AiHealth"/>
+  </testsuite>
+  <testsuite name="AI predict" id="2464d0bc-050f-4cae-bab2-4c1a85a6c901" timestamp="2026-06-10T03:14:29.238Z" tests="4" failures="0" errors="0" time="0.004">
+    <testcase name="AI predict returns 200" time="0.004" classname="AiPredict"/>
+    <testcase name="Prediction contains objects" time="0.004" classname="AiPredict"/>
+    <testcase name="Prediction contains person" time="0.004" classname="AiPredict"/>
+    <testcase name="Prediction confidence count matches object count" time="0.004" classname="AiPredict"/>
+  </testsuite>
+  <testsuite name="Create reading" id="c077f21a-f2e0-4bd8-bce0-7d0ca2a55081" timestamp="2026-06-10T03:14:29.238Z" tests="4" failures="0" errors="0" time="0.014">
+    <testcase name="Create reading returns 201" time="0.014" classname="CreateReading"/>
+    <testcase name="Reading accepted" time="0.014" classname="CreateReading"/>
+    <testcase name="Created reading has an id" time="0.014" classname="CreateReading"/>
+    <testcase name="Created reading keeps device id" time="0.014" classname="CreateReading"/>
+  </testsuite>
+  <testsuite name="List latest readings" id="422efb71-2993-4082-9d02-d88a30e9c838" timestamp="2026-06-10T03:14:29.238Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="Latest readings returns 200" time="0.004" classname="ListLatestReadings"/>
+    <testcase name="Latest readings contains items" time="0.004" classname="ListLatestReadings"/>
+  </testsuite>
+</testsuites>

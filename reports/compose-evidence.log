@@ -1,0 +1,203 @@
+﻿# Lab 05 Compose Evidence
+
+Generated: 2026-06-10
+
+## docker compose ps
+NAME                IMAGE                                              COMMAND                  SERVICE      CREATED          STATUS                    PORTS
+fit4110-ai-lab05    lab-5-hung981vpp-ai-service:v0.1.0-iot-ingestion   "uvicorn ai_service.…"   ai-service   17 minutes ago   Up 17 minutes (healthy)   0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp
+fit4110-api-lab05   lab-5-hung981vpp-api:v0.1.0-iot-ingestion          "sh -c 'uvicorn iot_…"   api          17 minutes ago   Up 17 minutes (healthy)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+fit4110-db-lab05    postgres:15-alpine                                 "docker-entrypoint.s…"   db           17 minutes ago   Up 17 minutes (healthy)   5432/tcp
+
+## API health
+{"status":"ok","service":"iot-ingestion","version":"0.5.0"}
+
+## AI health
+{"status":"ok","service":"ai-service","version":"0.5.0"}
+
+## DB readiness
+/var/run/postgresql:5432 - accepting connections
+
+## Image tags
+lab-5-hung981vpp-api:latest
+lab-5-hung981vpp-api:v0.1.0-iot-ingestion
+lab-5-hung981vpp-ai-service:latest
+lab-5-hung981vpp-ai-service:v0.1.0-iot-ingestion
+
+## Recent logs
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     127.0.0.1:53772 - "GET /health HTTP/1.1" 200 OK
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     127.0.0.1:40252 - "GET /health HTTP/1.1" 200 OK
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:42434 - "GET /health HTTP/1.1" 200 OK
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-api-lab05  | INFO:     172.19.0.1:43376 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:53854 - "GET /health HTTP/1.1" 200 OK
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-ai-lab05   | INFO:     172.20.0.1:55644 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+fit4110-db-lab05   | 
+fit4110-db-lab05   | PostgreSQL Database directory appears to contain a database; Skipping initialization
+fit4110-db-lab05   | 
+fit4110-db-lab05   | 2026-06-10 02:44:17.068 UTC [1] LOG:  starting PostgreSQL 15.17 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+fit4110-db-lab05   | 2026-06-10 02:44:17.069 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+fit4110-db-lab05   | 2026-06-10 02:44:17.069 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+fit4110-db-lab05   | 2026-06-10 02:44:17.075 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+fit4110-db-lab05   | 2026-06-10 02:44:17.083 UTC [29] LOG:  database system was shut down at 2026-06-10 02:44:14 UTC
+fit4110-db-lab05   | 2026-06-10 02:44:17.090 UTC [1] LOG:  database system is ready to accept connections
+fit4110-db-lab05   | 2026-06-10 02:49:17.157 UTC [27] LOG:  checkpoint starting: time
+fit4110-db-lab05   | 2026-06-10 02:49:17.187 UTC [27] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.002 s, total=0.031 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB
+
+## GHCR pushed images
+ghcr.io/hung981vpp/iot-ingestion-api:v0.1.0-iot-ingestion
+digest: sha256:2adbbbbc11a69526f3a6297b4d434b176bc0e9adf107967c02bdae55827ac7f0
+ghcr.io/hung981vpp/iot-ingestion-ai-service:v0.1.0-iot-ingestion
+digest: sha256:b65d8c6753d325c33aa1fdfa44a98777e41a65d676c8c9168b7eec44f8519f4c
