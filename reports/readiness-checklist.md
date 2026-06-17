@@ -1,18 +1,34 @@
-﻿# Checklist Sẵn Sàng Demo Buổi 6 - IoT Ingestion
+# Checklist Sẵn Sàng Demo Buổi 6 - IoT Ingestion
 
-Tick từng mục trước khi báo nhóm đã sẵn sàng demo.
+Tick từng mục trước khi báo nhóm đã sẵn sàng demo. Các mục cần xác nhận từ Radmin/nhóm đối tác để trống cho đến khi test thật trên lớp.
 
-- [ ] Máy demo đã kết nối đúng hotspot của Product.
-- [ ] Đã lấy IP máy demo và công bố cho Product/nhóm đối tác.
-- [ ] Đã cập nhật `.env` với URL nhóm đối tác.
-- [ ] `docker compose --profile mqtt ps` hiển thị các container cần thiết đang chạy.
-- [ ] `GET /health` của nhóm mình trả thành công.
-- [ ] Nhóm khác gọi được `GET /health` của nhóm mình qua IP hotspot.
-- [ ] Mình gọi được `GET /health` của nhóm đối tác qua `/partners/health`.
-- [ ] Endpoint tích hợp chính đã test bằng request mẫu.
-- [ ] MQTT worker nhận dữ liệu live và publish processed event.
-- [ ] Có log, screenshot, request/response mẫu.
-- [ ] Có phương án xử lý timeout hoặc service phụ thuộc lỗi.
+- [x] Máy demo chính đã cài Radmin VPN.
+- [ ] Đã join đúng Radmin Network của Product/cụm demo.
+- [ ] Đã ghi Radmin IP vào bảng chung.
+- [x] Service chạy bằng Docker Compose.
+- [x] `docker compose ps` hiển thị container running.
+- [x] `GET /health` local thành công.
+- [ ] Nhóm đối tác gọi được `/health` qua Radmin IP.
+- [ ] `.env` đã dùng Radmin IP của nhóm đối tác.
+- [x] Endpoint nghiệp vụ hoặc MQTT topic đã test.
+- [x] Có log xử lý input/output.
+- [x] Có request/response hoặc payload MQTT mẫu.
+- [x] Có minh chứng trong `reports/`.
+- [x] Có xử lý timeout hoặc lỗi từ service phụ thuộc.
+
+## Cần Tick Khi Lên Lớp
+
+Các mục này chỉ tick sau khi đã có Radmin Network/IP thật:
+
+```text
+[ ] Máy demo chính đã cài Radmin VPN
+[ ] Đã join đúng Radmin Network của Product/cụm demo
+[ ] Đã ghi Radmin IP vào bảng chung
+[x] docker compose ps hiển thị container running
+[x] GET /health local thành công
+[ ] Nhóm đối tác gọi được /health qua Radmin IP
+[ ] .env đã dùng Radmin IP của nhóm đối tác
+```
 
 ## Endpoint Cần Test
 
@@ -49,8 +65,9 @@ Lưu ảnh chụp/log vào `reports/`:
 - [ ] `reports/health-local.png`
 - [ ] `reports/health-partner.png`
 - [ ] `reports/integration-request-response.png`
-- [ ] `reports/logs-compose.txt`
-- [ ] `reports/newman-report.html` hoặc `reports/newman-report.xml`
+- [x] `reports/logs-compose.txt`
+- [x] `reports/integration-request-response.txt`
+- [x] `reports/raw-demo-request.json`
 - [x] `reports/readiness-checklist.md`
 
 ## Rubric Gợi Ý
@@ -58,10 +75,10 @@ Lưu ảnh chụp/log vào `reports/`:
 | Tiêu chí | Điểm |
 | --- | ---: |
 | Service chạy ổn định trên máy demo, `/health` thành công | 2.0 |
-| Nhóm khác gọi được service qua hotspot/IP | 2.0 |
+| Nhóm khác gọi được service qua Radmin IP | 2.0 |
 | Endpoint tích hợp đúng OpenAPI đã chốt | 1.5 |
 | Có xử lý timeout hoặc lỗi từ service phụ thuộc | 1.5 |
-| Có minh chứng: log, ảnh, Newman report, request/response | 1.5 |
+| Có minh chứng: log, ảnh, request/response hoặc payload MQTT | 1.5 |
 | Trình bày demo rõ ràng, đúng luồng tích hợp | 1.5 |
 | Tổng | 10.0 |
 
@@ -69,23 +86,24 @@ Trọng tâm Buổi 6 là khả năng bắt tay thật giữa các service, khô
 
 ## Kết Quả Hiện Tại
 
-Cập nhật trong lúc chuẩn bị demo:
-
 ```text
 Docker compose:
-- Chưa cập nhật
+- Đã từng chạy được với api, db, ai-service và mqtt-worker.
+- Cần chạy lại trên lớp sau khi Docker Desktop sẵn sàng.
 
 Local /health:
-- Chưa cập nhật
+- Đã từng trả status=ok.
+- Cần test lại ngay trước demo.
 
 Partner /health:
-- Chưa cập nhật
+- Chưa tick vì cần Radmin IP thật của nhóm đối tác.
 
 IoT MQTT live:
-- Chưa cập nhật
+- Đã có log mqtt-worker xử lý raw IoT và publish processed event.
 
 Endpoint tích hợp chính:
-- Chưa cập nhật
+- Đã có reports/raw-demo-request.json.
+- Đã có reports/integration-request-response.txt.
 
 Timeout/failure handling:
 - REQUEST_TIMEOUT được đọc từ .env.

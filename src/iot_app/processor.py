@@ -1,5 +1,6 @@
 import csv
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
@@ -48,14 +49,82 @@ def validate_raw_payload(payload: Dict[str, Any]) -> List[str]:
     required = [
         "event_id",
         "event_type",
-        "source_service",
-        "device_id",
         "timestamp",
+        "device_id",
         "temperature_c",
         "humidity_percent",
         "motion_detected",
     ]
     return [field for field in required if field not in payload]
+
+
+def is_iso8601(value: Any) -> bool:
+    if not isinstance(value, str) or not value.strip():
+        return False
+    try:
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return True
+
+
+def coerce_number(value: Any) -> Any:
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        raise ValueError("boolean is not a number")
+    if isinstance(value, (int, float)):
+        return value
+    if isinstance(value, str) and value.strip():
+        return float(value)
+    raise ValueError("invalid number")
+
+
+def coerce_boolean(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int) and value in {0, 1}:
+        return bool(value)
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "1", "yes"}:
+            return True
+        if normalized in {"false", "0", "no"}:
+            return False
+    raise ValueError("invalid boolean")
+
+
+def normalize_raw_payload(payload: Dict[str, Any]) -> tuple[Dict[str, Any], List[str]]:
+    normalized = dict(payload)
+    normalized.pop("scenario_hint_for_teacher", None)
+
+    errors: List[str] = []
+    if not is_iso8601(normalized.get("timestamp")):
+        errors.append("invalid_timestamp")
+
+    number_fields = [
+        "temperature_c",
+        "humidity_percent",
+        "light_lux",
+        "co2_ppm",
+        "smoke_ppm",
+        "battery_percent",
+    ]
+    for field in number_fields:
+        if field not in normalized:
+            continue
+        try:
+            normalized[field] = coerce_number(normalized[field])
+        except ValueError:
+            errors.append(f"invalid_{field}")
+
+    if "motion_detected" in normalized:
+        try:
+            normalized["motion_detected"] = coerce_boolean(normalized["motion_detected"])
+        except ValueError:
+            errors.append("invalid_motion_detected")
+
+    return normalized, errors
 
 
 def classify_raw_payload(payload: Dict[str, Any], device: Optional[DeviceRecord]) -> tuple[str, str, str]:
@@ -120,6 +189,7 @@ def to_processed_reason(reason: str) -> str:
         "deviceNotRegistered": "device_not_registered",
         "deviceInactive": "device_inactive",
         "missingRequiredField": "missing_required_field",
+        "normalizationFailed": "normalization_failed",
         "missingSensorValue": "missing_sensor_value",
         "invalidSensorValue": "invalid_sensor_value",
         "temperatureTooHigh": "temperature_too_high",
@@ -143,22 +213,22 @@ def build_processed_event(
     device: Optional[DeviceRecord],
 ) -> Dict[str, Any]:
     return {
-        "event_id": f"sensor-event-{uuid4()}",
-        "event_type": "sensor.reading.processed",
-        "source_service": "team-iot",
+        "eventId": f"sensor-event-{uuid4()}",
+        "eventType": "sensor.reading.processed",
+        "sourceService": "team-iot",
         "timestamp": payload["timestamp"],
-        "raw_event_id": payload.get("event_id"),
-        "device_id": payload["device_id"],
+        "rawEventId": payload.get("event_id"),
+        "deviceId": payload["device_id"],
         "location": device.location if device else payload.get("location", "Unknown Area"),
-        "temperature_c": payload.get("temperature_c"),
-        "humidity_percent": payload.get("humidity_percent"),
-        "motion_detected": payload.get("motion_detected"),
-        "light_lux": payload.get("light_lux"),
-        "co2_ppm": payload.get("co2_ppm"),
-        "smoke_ppm": payload.get("smoke_ppm"),
-        "battery_percent": payload.get("battery_percent"),
+        "temperatureC": payload.get("temperature_c"),
+        "humidityPercent": payload.get("humidity_percent"),
+        "motionDetected": payload.get("motion_detected"),
+        "lightLux": payload.get("light_lux"),
+        "co2Ppm": payload.get("co2_ppm"),
+        "smokePpm": payload.get("smoke_ppm"),
+        "batteryPercent": payload.get("battery_percent"),
         "status": to_processed_status(status),
-        "alert_level": alert_level,
+        "alertLevel": alert_level,
         "reason": to_processed_reason(reason),
     }
 
@@ -256,6 +326,19 @@ def process_raw_sample(payload: Dict[str, Any], registry: Dict[str, DeviceRecord
             events=[],
         )
 
+    normalized_payload, normalization_errors = normalize_raw_payload(payload)
+    if normalization_errors:
+        return ProcessedRawSample(
+            raw_event_id=str(payload.get("event_id", "")),
+            device_id=str(payload.get("device_id", "")),
+            status="sensorError",
+            alert_level="medium",
+            reason="normalizationFailed",
+            processed_event=None,
+            events=[],
+        )
+
+    payload = normalized_payload
     device_id = payload["device_id"]
     device = registry.get(device_id)
     status, alert_level, reason = classify_raw_payload(payload, device)

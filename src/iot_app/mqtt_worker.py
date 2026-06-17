@@ -7,7 +7,7 @@ from typing import Any
 
 from paho.mqtt import client as mqtt
 
-from iot_app.processor import load_device_registry, process_raw_sample, topic_for_event
+from iot_app.processor import load_device_registry, process_raw_sample, topic_for_event, validate_raw_payload
 
 
 logging.basicConfig(
@@ -63,6 +63,16 @@ def main() -> None:
             LOGGER.exception("invalid_json topic=%s", message.topic)
             return
 
+        missing_fields = validate_raw_payload(payload)
+        if missing_fields:
+            LOGGER.error(
+                "invalid_raw_payload error=missing_required_field missing_fields=%s raw_event_id=%s topic=%s",
+                missing_fields,
+                payload.get("event_id"),
+                message.topic,
+            )
+            return
+
         processed = process_raw_sample(payload, registry)
         LOGGER.info(
             "processed_raw raw_event_id=%s device_id=%s status=%s alert_level=%s reason=%s contract_events=%s",
@@ -83,7 +93,7 @@ def main() -> None:
             LOGGER.info(
                 "published_processed_event topic=%s event_id=%s status=%s",
                 MQTT_SENSOR_OUTPUT_TOPIC,
-                processed.processed_event["event_id"],
+                processed.processed_event["eventId"],
                 processed.processed_event["status"],
             )
 
