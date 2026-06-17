@@ -62,6 +62,29 @@ services:
       retries: 3
       start_period: 10s
 
+  # Optional Buoi 6 MQTT worker. Run with: docker compose --profile mqtt up -d --build
+  mqtt-worker:
+    image: lab-5-hung981vpp-api:v0.1.0-iot-ingestion
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fit4110-mqtt-worker-lab06
+    command: ["python", "-m", "iot_app.mqtt_worker"]
+    env_file:
+      - .env
+    environment:
+      PYTHONPATH: /app/src
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - team-internal
+    profiles:
+      - mqtt
+    restart: unless-stopped
+    healthcheck:
+      disable: true
+
 networks:
   team-internal:
     driver: bridge

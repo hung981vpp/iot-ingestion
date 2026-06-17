@@ -1,0 +1,64 @@
+﻿=== docker compose --profile mqtt ps ===
+NAME                        IMAGE                                              COMMAND                  SERVICE       CREATED         STATUS                    PORTS
+fit4110-ai-lab05            lab-5-hung981vpp-ai-service:v0.1.0-iot-ingestion   "uvicorn ai_service.…"   ai-service    2 minutes ago   Up 2 minutes (healthy)    0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp
+fit4110-api-lab05           lab-5-hung981vpp-api:v0.1.0-iot-ingestion          "sh -c 'uvicorn iot_…"   api           2 minutes ago   Up 2 minutes (healthy)    0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+fit4110-db-lab05            postgres:15-alpine                                 "docker-entrypoint.s…"   db            4 days ago      Up 58 minutes (healthy)   5432/tcp
+fit4110-mqtt-worker-lab06   lab-5-hung981vpp-api:v0.1.0-iot-ingestion          "python -m iot_app.m…"   mqtt-worker   2 minutes ago   Up 2 minutes              8000/tcp
+
+=== docker compose logs --tail=120 mqtt-worker ===
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:22,334 INFO iot_app.mqtt_worker loaded_registry count=5 path=data/IoT_device_registry.csv
+fit4110-mqtt-worker-lab06  | /app/src/iot_app/mqtt_worker.py:33: DeprecationWarning: Callback API version 1 is deprecated, update to latest version
+fit4110-mqtt-worker-lab06  |   client = mqtt.Client(client_id=MQTT_CLIENT_ID, protocol=mqtt.MQTTv5)
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:23,850 INFO iot_app.mqtt_worker mqtt_connected reason_code=Success input_topic=smart-campus/raw/iot/environment
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:27,133 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-3b7d87b68c device_id=esp32-library-01 status=warning alert_level=medium reason=lowBattery contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:27,134 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-51264127-737a-4534-a789-6e714c43a245 status=warning
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:32,363 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-b2e1867420 device_id=esp32-hall-b201 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:32,363 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-b3dd5ff7-18ec-4975-98e9-e062a336be4f status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:37,591 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-c2b5b896dc device_id=esp32-hall-b201 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:37,592 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-a8498d41-4dd3-41fe-8eca-ef325f07d2ad status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:42,819 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-edbdd88855 device_id=esp32-hall-b201 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:42,820 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-123f99b4-320c-4fd5-a438-e36dd519b349 status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:48,093 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-ef94ddc14d device_id=esp32-lab-a102 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:48,094 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-59513ec7-df48-48cf-83a5-8de1ae76a814 status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:54,806 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-89ec7b9a64 device_id=esp32-unknown-01 status=invalidDevice alert_level=high reason=deviceNotRegistered contract_events=0
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:46:54,806 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-5e3a7cc7-8dcc-44cd-9f2e-c9f90bd71b67 status=invalid_device
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:10,242 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-d7294a26f8 device_id=esp32-lab-a102 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:10,242 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-b4b2c00d-c585-4005-b8fc-aa4e3d93f93a status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:12,066 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-36205ee5e9 device_id=esp32-hall-b201 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:12,066 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-f3de0db7-5292-4531-b57f-4f4ad2efc0fb status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:12,067 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-7cb32f4c20 device_id=esp32-lab-a102 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:12,067 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-a21103c5-2087-4106-810b-e05272323a19 status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:14,250 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-e851e0cf73 device_id=esp32-lab-a101 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:14,250 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-ffa80e17-7db7-4e61-bb79-6e7d96bc7429 status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:20,306 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-b85736ba8b device_id=esp32-lab-a102 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:20,306 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-23a5fb75-beb4-4d29-9513-8beb9e30f979 status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:25,972 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-2d61590c2d device_id=esp32-library-01 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:25,972 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-7aa3102c-9ad6-4c98-8403-168f7c92961f status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:30,513 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-e8520f966c device_id=esp32-lab-a101 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:30,513 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-da5950d5-a76a-4cda-8e76-5bbb78211133 status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:35,162 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-53bf9fb2b8 device_id=esp32-lab-a101 status=sensorError alert_level=medium reason=missingSensorValue contract_events=0
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:35,162 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-b8af5b11-39a5-4fad-a170-51fdd8501e80 status=sensor_error
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:40,385 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-f3c2597bcb device_id=esp32-library-01 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:40,385 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-f5852bce-fe2d-434c-9c71-cf22a958b89f status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:45,563 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-b4efab5c1a device_id=esp32-hall-b201 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:45,563 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-6152c88e-ba55-48ac-8064-5ea73a991348 status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:50,786 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-d89d22dbca device_id=esp32-gate-a status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:50,786 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-cf8567e6-679f-41bf-946c-1a12c04e2d59 status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:56,010 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-810a9031b7 device_id=esp32-lab-a102 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:47:56,010 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-d62e61f9-ede6-4737-bc09-06ee37a04cfd status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:01,224 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-8c92664ee8 device_id=esp32-hall-b201 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:01,225 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-56a4fd1b-7f3c-4595-ade2-3d7b79247fc0 status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:06,444 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-4487bbd255 device_id=esp32-lab-a101 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:06,445 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-3f240fe6-70f1-4e56-9a0e-989201e8d97b status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:11,669 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-59bfd704b0 device_id=esp32-lab-a102 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:11,670 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-12b49bc1-008b-4161-8655-69a002fb8b78 status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:16,916 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-3f0e0b367f device_id=esp32-lab-a101 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:16,916 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-edbd7fa7-612b-4f4e-9ff5-2c7d012af89a status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:22,133 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-bd2804d98d device_id=esp32-gate-a status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:22,134 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-e10e5147-96e3-4ded-9616-1809a8306755 status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:27,359 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-9b25ad7676 device_id=esp32-hall-b201 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:27,360 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-59a7961a-b351-43ff-bf68-31bf0b26e7d2 status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:32,580 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-f672a7dd0f device_id=esp32-lab-a101 status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:32,580 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-5ed26666-d404-4e32-94f7-09d9a8fca5d7 status=normal
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:37,805 INFO iot_app.mqtt_worker processed_raw raw_event_id=raw-iot-4be1055809 device_id=esp32-gate-a status=normal alert_level=none reason=environmentNormal contract_events=8
+fit4110-mqtt-worker-lab06  | 2026-06-14 15:48:37,805 INFO iot_app.mqtt_worker published_processed_event topic=smart-campus/events/sensor event_id=sensor-event-49dcb528-00ac-49ed-be54-3d9d45c66445 status=normal

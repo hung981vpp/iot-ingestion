@@ -1,0 +1,24 @@
+﻿=== Request ===
+POST http://localhost:8000/iot/raw/process
+Authorization: Bearer local-dev-token
+Content-Type: application/json
+
+{
+  "event_id": "raw-demo-001",
+  "event_type": "iot.environment.reading",
+  "source_service": "simulator",
+  "device_id": "esp32-lab-a101",
+  "timestamp": "2026-06-14T20:00:00Z",
+  "location": "Lab A101",
+  "temperature_c": 38.5,
+  "humidity_percent": 70,
+  "motion_detected": true,
+  "light_lux": 400,
+  "co2_ppm": 800,
+  "smoke_ppm": 0,
+  "battery_percent": 90
+}
+
+
+=== Response ===
+{"rawEventId":"raw-demo-001","deviceId":"esp32-lab-a101","status":"warning","alertLevel":"medium","reason":"temperatureWarning","published":true,"processedEvent":{"event_id":"sensor-event-8fcb996a-16dd-4ce9-98b1-e4ad07182264","event_type":"sensor.reading.processed","source_service":"team-iot","timestamp":"2026-06-14T20:00:00Z","raw_event_id":"raw-demo-001","device_id":"esp32-lab-a101","location":"Lab A101","temperature_c":38.5,"humidity_percent":70,"motion_detected":true,"light_lux":400,"co2_ppm":800,"smoke_ppm":0,"battery_percent":90,"status":"warning","alert_level":"medium","reason":"temperature_warning"},"contractEvents":[{"eventId":"1ab02c41-71f3-4db1-86aa-53a55ba82d77","eventType":"sensor.reading.created","timestamp":"2026-06-14T20:00:00Z","source":"iot-ingestion","data":{"deviceId":"esp32-lab-a101","timestamp":"2026-06-14T20:00:00Z","locationId":"A101","correlationId":null,"sensorType":"temperature","value":38.5,"unit":"celsius"}},{"eventId":"6ca09cb4-dc08-4126-9dd2-e1e1700315a3","eventType":"sensor.reading.created","timestamp":"2026-06-14T20:00:00Z","source":"iot-ingestion","data":{"deviceId":"esp32-lab-a101","timestamp":"2026-06-14T20:00:00Z","locationId":"A101","correlationId":null,"sensorType":"humidity","value":70,"unit":"percent"}},{"eventId":"687ff0ab-acc7-41a6-8b34-8372e4c16274","eventType":"sensor.reading.created","timestamp":"2026-06-14T20:00:00Z","source":"iot-ingestion","data":{"deviceId":"esp32-lab-a101","timestamp":"2026-06-14T20:00:00Z","locationId":"A101","correlationId":null,"sensorType":"motion","value":true,"unit":"boolean"}},{"eventId":"f751cb07-4264-4d22-a8a8-6da55138237e","eventType":"sensor.reading.created","timestamp":"2026-06-14T20:00:00Z","source":"iot-ingestion","data":{"deviceId":"esp32-lab-a101","timestamp":"2026-06-14T20:00:00Z","locationId":"A101","correlationId":null,"sensorType":"smoke","value":0,"unit":"ppm"}},{"eventId":"c1700d04-3a49-4db8-8b61-30415432ea87","eventType":"sensor.threshold.exceeded","timestamp":"2026-06-14T20:00:00Z","source":"iot-ingestion","data":{"deviceId":"esp32-lab-a101","sensorType":"temperature","value":38.5,"threshold":35.0,"unit":"celsius","timestamp":"2026-06-14T20:00:00Z","severity":"HIGH","locationId":"A101"}},{"eventId":"2e319ae8-8545-47c3-9bc2-c8ac55cd2379","eventType":"telemetry.ingested","timestamp":"2026-06-14T20:00:00Z","source":"iot-ingestion","data":{"deviceId":"esp32-lab-a101","timestamp":"2026-06-14T20:00:00Z","zoneId":"A101","batchId":null,"sensorType":"temperature","value":38.5,"unit":"celsius"}},{"eventId":"107ad925-f986-4f9c-afa1-177258e43f29","eventType":"telemetry.ingested","timestamp":"2026-06-14T20:00:00Z","source":"iot-ingestion","data":{"deviceId":"esp32-lab-a101","timestamp":"2026-06-14T20:00:00Z","zoneId":"A101","batchId":null,"sensorType":"humidity","value":70,"unit":"percent"}},{"eventId":"c6a4b112-396d-4a6c-ab00-6f939d03dcb7","eventType":"telemetry.ingested","timestamp":"2026-06-14T20:00:00Z","source":"iot-ingestion","data":{"deviceId":"esp32-lab-a101","timestamp":"2026-06-14T20:00:00Z","zoneId":"A101","batchId":null,"sensorType":"motion","value":true,"unit":"boolean"}},{"eventId":"b00157c6-4f9b-49a1-80cc-6b40052e2280","eventType":"telemetry.ingested","timestamp":"2026-06-14T20:00:00Z","source":"iot-ingestion","data":{"deviceId":"esp32-lab-a101","timestamp":"2026-06-14T20:00:00Z","zoneId":"A101","batchId":null,"sensorType":"smoke","value":0,"unit":"ppm"}}]}

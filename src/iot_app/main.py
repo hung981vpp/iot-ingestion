@@ -1,17 +1,34 @@
 import os
 from datetime import datetime, timezone
 from enum import Enum
+from http import HTTPStatus
+from pathlib import Path
 from typing import Dict, List, Optional
+from uuid import uuid4
 
+import requests
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, Response, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+from iot_app.processor import load_device_registry, process_raw_sample
 
 # Đọc biến môi trường với giá trị mặc định
 SERVICE_NAME = os.getenv("SERVICE_NAME", "iot-ingestion")
 SERVICE_VERSION = os.getenv("SERVICE_VERSION", "0.5.0")
 AUTH_TOKEN = os.getenv("AUTH_TOKEN", "local-dev-token")
+CORE_SERVICE_URL = os.getenv("CORE_SERVICE_URL", "").rstrip("/")
+ANALYTICS_SERVICE_URL = os.getenv("ANALYTICS_SERVICE_URL", "").rstrip("/")
+REQUEST_TIMEOUT = float(os.getenv("REQUEST_TIMEOUT", "5"))
+DEVICE_REGISTRY_PATH = os.getenv("DEVICE_REGISTRY_PATH", "data/IoT_device_registry.csv")
+
+
+def status_title(status_code: int) -> str:
+    try:
+        return HTTPStatus(status_code).phrase
+    except ValueError:
+        return "HTTP Error"
 
 
 app = FastAPI(
@@ -36,6 +53,19 @@ class SensorUnit(str, Enum):
     percent = "percent"
     boolean = "boolean"
     ppm = "ppm"
+
+
+class Severity(str, Enum):
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+    CRITICAL = "CRITICAL"
+
+
+class DeviceAvailability(str, Enum):
+    online = "online"
+    offline = "offline"
+    maintenance = "maintenance"
 
 
 class ProblemDetails(BaseModel):
@@ -84,7 +114,94 @@ class SensorReadingCreated(BaseModel):
     created_at: str
 
 
+class ContractModel(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class ContractSensorReadingCreate(ContractModel):
+    device_id: str = Field(..., alias="deviceId", min_length=3, examples=["SENSOR-001"])
+    sensor_type: SensorMetric = Field(..., alias="sensorType", examples=["temperature"])
+    value: float = Field(..., ge=-100, le=1000, examples=[38.5])
+    unit: SensorUnit = Field(..., examples=["celsius"])
+    timestamp: str = Field(..., examples=["2026-05-12T10:30:00Z"])
+    location_id: Optional[str] = Field(default=None, alias="locationId", examples=["ZONE-A-01"])
+    correlation_id: Optional[str] = Field(default=None, alias="correlationId")
+
+
+class ContractSensorReading(ContractSensorReadingCreate):
+    id: str
+    created_at: str = Field(..., alias="createdAt")
+
+
+class ContractSensorReadingList(ContractModel):
+    items: List[ContractSensorReading]
+    total: int
+    next_cursor: Optional[str] = Field(default=None, alias="nextCursor")
+
+
+class ContractThresholdData(ContractModel):
+    device_id: str = Field(..., alias="deviceId")
+    sensor_type: SensorMetric = Field(..., alias="sensorType")
+    value: float
+    threshold: float
+    unit: Optional[SensorUnit] = None
+    timestamp: str
+    severity: Optional[Severity] = None
+    location_id: Optional[str] = Field(default=None, alias="locationId")
+
+
+class ContractTelemetryData(ContractModel):
+    device_id: str = Field(..., alias="deviceId")
+    sensor_type: SensorMetric = Field(..., alias="sensorType")
+    value: float
+    unit: SensorUnit
+    timestamp: str
+    zone_id: Optional[str] = Field(default=None, alias="zoneId")
+    batch_id: Optional[str] = Field(default=None, alias="batchId")
+
+
+class ContractDeviceStatus(ContractModel):
+    device_id: str = Field(..., alias="deviceId")
+    status: DeviceAvailability
+    timestamp: str
+    previous_status: Optional[DeviceAvailability] = Field(default=None, alias="previousStatus")
+    reason: Optional[str] = None
+
+
+class ContractEvent(ContractModel):
+    event_id: str = Field(..., alias="eventId")
+    event_type: str = Field(..., alias="eventType")
+    timestamp: str
+    source: str
+    data: Dict
+
+
+class ContractEventList(ContractModel):
+    items: List[ContractEvent]
+    total: int
+    next_cursor: Optional[str] = Field(default=None, alias="nextCursor")
+
+
+class PartnerHealth(ContractModel):
+    name: str
+    configured: bool
+    url: Optional[str] = None
+    ok: bool
+    status_code: Optional[int] = Field(default=None, alias="statusCode")
+    error: Optional[str] = None
+
+
+class PartnerHealthList(ContractModel):
+    items: List[PartnerHealth]
+
+
 READINGS: List[Dict] = []
+CONTRACT_READINGS: List[Dict] = []
+CONTRACT_THRESHOLD_EVENTS: List[Dict] = []
+CONTRACT_TELEMETRY_EVENTS: List[Dict] = []
+CONTRACT_EVENTS: List[Dict] = []
+DEVICE_STATUSES: Dict[str, Dict] = {}
+PROCESSED_IOT_EVENTS: List[Dict] = []
 
 
 def build_problem(
@@ -113,13 +230,13 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     else:
         problem = build_problem(
             status_code=exc.status_code,
-            title=status.HTTP_STATUS_CODES.get(exc.status_code, "HTTP Error"),
+            title=status_title(exc.status_code),
             detail=str(exc.detail),
             instance=str(request.url.path),
         )
 
     problem.setdefault("status", exc.status_code)
-    problem.setdefault("title", status.HTTP_STATUS_CODES.get(exc.status_code, "HTTP Error"))
+    problem.setdefault("title", status_title(exc.status_code))
     problem.setdefault("type", "about:blank")
     problem.setdefault("detail", "Request failed")
     problem.setdefault("instance", str(request.url.path))
@@ -188,6 +305,133 @@ def next_reading_id() -> str:
     return f"R-{today}-{len(READINGS) + 1:04d}"
 
 
+def build_contract_event(event_type: str, data: Dict) -> Dict:
+    return {
+        "eventId": str(uuid4()),
+        "eventType": event_type,
+        "timestamp": now_iso(),
+        "source": SERVICE_NAME,
+        "data": data,
+    }
+
+
+def threshold_for_reading(reading: Dict) -> Optional[Dict]:
+    sensor_type = reading["sensorType"]
+    value = reading["value"]
+
+    thresholds = {
+        "temperature": {"warning": 35.0, "critical": 40.0, "unit": "celsius"},
+        "humidity": {"warning": 85.0, "critical": None, "unit": "percent"},
+        "smoke": {"warning": 0.5, "critical": 1.0, "unit": "ppm"},
+    }
+    config = thresholds.get(sensor_type)
+    if not config:
+        return None
+
+    critical = config["critical"]
+    warning = config["warning"]
+    if critical is not None and value >= critical:
+        threshold = critical
+        severity = Severity.CRITICAL.value
+    elif value >= warning:
+        threshold = warning
+        severity = Severity.HIGH.value
+    else:
+        return None
+
+    return {
+        "deviceId": reading["deviceId"],
+        "sensorType": sensor_type,
+        "value": value,
+        "threshold": threshold,
+        "unit": config["unit"],
+        "timestamp": reading["timestamp"],
+        "severity": severity,
+        "locationId": reading.get("locationId"),
+    }
+
+
+def remember_contract_reading(reading: Dict) -> None:
+    CONTRACT_READINGS.append(reading)
+
+    sensor_event = build_contract_event("sensor.reading.created", reading)
+    CONTRACT_EVENTS.append(sensor_event)
+
+    telemetry_data = {
+        "deviceId": reading["deviceId"],
+        "sensorType": reading["sensorType"],
+        "value": reading["value"],
+        "unit": reading["unit"],
+        "timestamp": reading["timestamp"],
+        "zoneId": reading.get("locationId"),
+        "batchId": None,
+    }
+    telemetry_event = build_contract_event("telemetry.ingested", telemetry_data)
+    CONTRACT_TELEMETRY_EVENTS.append(telemetry_event)
+    CONTRACT_EVENTS.append(telemetry_event)
+
+    threshold_data = threshold_for_reading(reading)
+    if threshold_data:
+        threshold_event = build_contract_event("sensor.threshold.exceeded", threshold_data)
+        CONTRACT_THRESHOLD_EVENTS.append(threshold_event)
+        CONTRACT_EVENTS.append(threshold_event)
+
+    DEVICE_STATUSES[reading["deviceId"]] = {
+        "deviceId": reading["deviceId"],
+        "status": DeviceAvailability.online.value,
+        "timestamp": now_iso(),
+        "previousStatus": None,
+        "reason": "sensorReadingReceived",
+    }
+
+
+def check_partner_health(name: str, base_url: str) -> Dict:
+    if not base_url:
+        return {
+            "name": name,
+            "configured": False,
+            "url": None,
+            "ok": False,
+            "statusCode": None,
+            "error": "notConfigured",
+        }
+
+    url = f"{base_url}/health"
+    try:
+        response = requests.get(url, timeout=REQUEST_TIMEOUT)
+    except requests.Timeout:
+        return {
+            "name": name,
+            "configured": True,
+            "url": url,
+            "ok": False,
+            "statusCode": None,
+            "error": "timeout",
+        }
+    except requests.RequestException as exc:
+        return {
+            "name": name,
+            "configured": True,
+            "url": url,
+            "ok": False,
+            "statusCode": None,
+            "error": exc.__class__.__name__,
+        }
+
+    return {
+        "name": name,
+        "configured": True,
+        "url": url,
+        "ok": response.status_code == 200,
+        "statusCode": response.status_code,
+        "error": None if response.status_code == 200 else "healthCheckFailed",
+    }
+
+
+def load_registry_for_request() -> Dict:
+    return load_device_registry(Path(DEVICE_REGISTRY_PATH))
+
+
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     return HealthResponse(
@@ -247,6 +491,200 @@ def latest_readings(
         items = [item for item in items if item["device_id"] == device_id]
 
     return {"items": items[-limit:]}
+
+
+@app.post(
+    "/sensors/readings",
+    response_model=ContractSensorReading,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(verify_bearer_token)],
+    responses={
+        401: {"model": ProblemDetails},
+        422: {"model": ProblemDetails},
+        429: {"model": ProblemDetails},
+    },
+)
+def create_contract_sensor_reading(payload: ContractSensorReadingCreate) -> ContractSensorReading:
+    reading = {
+        "deviceId": payload.device_id,
+        "sensorType": payload.sensor_type.value,
+        "value": payload.value,
+        "unit": payload.unit.value,
+        "timestamp": payload.timestamp,
+        "locationId": payload.location_id,
+        "correlationId": payload.correlation_id,
+        "id": str(uuid4()),
+        "createdAt": now_iso(),
+    }
+    remember_contract_reading(reading)
+    return ContractSensorReading.model_validate(reading)
+
+
+@app.get(
+    "/sensors/readings",
+    response_model=ContractSensorReadingList,
+    dependencies=[Depends(verify_bearer_token)],
+)
+def get_contract_sensor_readings(
+    device_id: Optional[str] = Query(default=None, alias="deviceId"),
+    sensor_type: Optional[SensorMetric] = Query(default=None, alias="sensorType"),
+    limit: int = Query(default=20, ge=1, le=100),
+) -> ContractSensorReadingList:
+    items = CONTRACT_READINGS
+    if device_id:
+        items = [item for item in items if item["deviceId"] == device_id]
+    if sensor_type:
+        items = [item for item in items if item["sensorType"] == sensor_type.value]
+
+    limited_items = items[-limit:]
+    return ContractSensorReadingList(
+        items=[ContractSensorReading.model_validate(item) for item in limited_items],
+        total=len(items),
+        nextCursor=None,
+    )
+
+
+@app.get(
+    "/sensors/threshold-exceeded",
+    response_model=ContractEventList,
+    dependencies=[Depends(verify_bearer_token)],
+)
+def get_threshold_exceeded_events(
+    severity: Optional[Severity] = Query(default=None),
+    limit: int = Query(default=20, ge=1, le=100),
+) -> ContractEventList:
+    items = CONTRACT_THRESHOLD_EVENTS
+    if severity:
+        items = [item for item in items if item["data"].get("severity") == severity.value]
+
+    limited_items = items[-limit:]
+    return ContractEventList(
+        items=[ContractEvent.model_validate(item) for item in limited_items],
+        total=len(items),
+        nextCursor=None,
+    )
+
+
+@app.get(
+    "/telemetry",
+    response_model=ContractEventList,
+    dependencies=[Depends(verify_bearer_token)],
+)
+def get_telemetry(
+    device_id: Optional[str] = Query(default=None, alias="deviceId"),
+    zone_id: Optional[str] = Query(default=None, alias="zoneId"),
+    limit: int = Query(default=20, ge=1, le=100),
+) -> ContractEventList:
+    items = CONTRACT_TELEMETRY_EVENTS
+    if device_id:
+        items = [item for item in items if item["data"].get("deviceId") == device_id]
+    if zone_id:
+        items = [item for item in items if item["data"].get("zoneId") == zone_id]
+
+    limited_items = items[-limit:]
+    return ContractEventList(
+        items=[ContractEvent.model_validate(item) for item in limited_items],
+        total=len(items),
+        nextCursor=None,
+    )
+
+
+@app.get(
+    "/devices/{deviceId}/status",
+    response_model=ContractDeviceStatus,
+    dependencies=[Depends(verify_bearer_token)],
+)
+def get_device_status(deviceId: str) -> ContractDeviceStatus:
+    device_status = DEVICE_STATUSES.get(deviceId)
+    if not device_status:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=build_problem(
+                status_code=status.HTTP_404_NOT_FOUND,
+                title="Not Found",
+                detail=f"Device {deviceId} does not exist",
+                instance=f"/devices/{deviceId}/status",
+                problem_type="https://iot.campus.local/errors/not-found",
+            ),
+        )
+
+    return ContractDeviceStatus.model_validate(device_status)
+
+
+@app.get(
+    "/events",
+    response_model=ContractEventList,
+    dependencies=[Depends(verify_bearer_token)],
+)
+def get_iot_events(
+    event_type: Optional[str] = Query(default=None, alias="eventType"),
+    limit: int = Query(default=20, ge=1, le=100),
+) -> ContractEventList:
+    allowed_event_types = {
+        "sensor.reading.created",
+        "sensor.threshold.exceeded",
+        "telemetry.ingested",
+        "device.status.changed",
+    }
+    if event_type and event_type not in allowed_event_types:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=build_problem(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                title="Bad Request",
+                detail=f"eventType {event_type} is not supported",
+                instance="/events",
+                problem_type="https://iot.campus.local/errors/validation",
+            ),
+        )
+
+    items = CONTRACT_EVENTS
+    if event_type:
+        items = [item for item in items if item["eventType"] == event_type]
+
+    limited_items = items[-limit:]
+    return ContractEventList(
+        items=[ContractEvent.model_validate(item) for item in limited_items],
+        total=len(items),
+        nextCursor=None,
+    )
+
+
+@app.get(
+    "/partners/health",
+    response_model=PartnerHealthList,
+    dependencies=[Depends(verify_bearer_token)],
+)
+def get_partner_health() -> PartnerHealthList:
+    checks = [
+        check_partner_health("core", CORE_SERVICE_URL),
+        check_partner_health("analytics", ANALYTICS_SERVICE_URL),
+    ]
+    return PartnerHealthList(items=[PartnerHealth.model_validate(item) for item in checks])
+
+
+@app.post("/iot/raw/process", dependencies=[Depends(verify_bearer_token)])
+def process_iot_raw_payload(payload: Dict) -> Dict:
+    processed = process_raw_sample(payload, load_registry_for_request())
+    if processed.processed_event:
+        PROCESSED_IOT_EVENTS.append(processed.processed_event)
+
+    return {
+        "rawEventId": processed.raw_event_id,
+        "deviceId": processed.device_id,
+        "status": processed.status,
+        "alertLevel": processed.alert_level,
+        "reason": processed.reason,
+        "published": processed.processed_event is not None,
+        "processedEvent": processed.processed_event,
+        "contractEvents": processed.events,
+    }
+
+
+@app.get("/iot/processed-events", dependencies=[Depends(verify_bearer_token)])
+def get_processed_iot_events(limit: int = Query(default=20, ge=1, le=100)) -> Dict:
+    items = PROCESSED_IOT_EVENTS[-limit:]
+    return {"items": items, "total": len(PROCESSED_IOT_EVENTS)}
 
 
 @app.get("/readings/{reading_id}", dependencies=[Depends(verify_bearer_token)])

@@ -1,0 +1,15 @@
+{
+  "event_id": "raw-demo-001",
+  "event_type": "iot.environment.reading",
+  "source_service": "simulator",
+  "device_id": "esp32-lab-a101",
+  "timestamp": "2026-06-14T20:00:00Z",
+  "location": "Lab A101",
+  "temperature_c": 38.5,
+  "humidity_percent": 70,
+  "motion_detected": true,
+  "light_lux": 400,
+  "co2_ppm": 800,
+  "smoke_ppm": 0,
+  "battery_percent": 90
+}

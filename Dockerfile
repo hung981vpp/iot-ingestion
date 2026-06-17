@@ -38,6 +38,7 @@ RUN addgroup --system appgroup \
 
 COPY --from=builder /opt/venv /opt/venv
 COPY src/ ./src/
+COPY data/ ./data/
 
 # Cấp quyền cho user
 RUN chown -R appuser:appgroup /app
