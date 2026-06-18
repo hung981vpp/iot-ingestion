@@ -1,15 +1,17 @@
-# Checklist Sẵn Sàng Demo Buổi 6 - IoT Ingestion
+﻿# Checklist Sẵn Sàng Demo Buổi 6 - IoT Ingestion
 
-Tick từng mục trước khi báo nhóm đã sẵn sàng demo. Các mục cần xác nhận từ Radmin/nhóm đối tác để trống cho đến khi test thật trên lớp.
+Tick từng mục trước khi báo nhóm đã sẵn sàng demo. Các mục cần xác nhận từ Radmin/nhóm đối tác chỉ tick sau khi test thật.
 
 - [x] Máy demo chính đã cài Radmin VPN.
-- [ ] Đã join đúng Radmin Network của Product/cụm demo.
-- [ ] Đã ghi Radmin IP vào bảng chung.
+- [x] Đã join đúng Radmin Network của Product/cụm demo.
+- [x] Đã ghi Radmin IP vào bảng chung.
 - [x] Service chạy bằng Docker Compose.
 - [x] `docker compose ps` hiển thị container running.
 - [x] `GET /health` local thành công.
-- [ ] Nhóm đối tác gọi được `/health` qua Radmin IP.
-- [ ] `.env` đã dùng Radmin IP của nhóm đối tác.
+- [x] Nhóm đối tác gọi được `/health` qua Radmin IP.
+- [x] `.env` đã dùng Radmin IP của nhóm đối tác.
+- [x] Mình gọi được Core `/health` qua `/partners/health`.
+- [x] Mình gọi được Analytics `/health` qua `/partners/health`.
 - [x] Endpoint nghiệp vụ hoặc MQTT topic đã test.
 - [x] Có log xử lý input/output.
 - [x] Có request/response hoặc payload MQTT mẫu.
@@ -18,16 +20,16 @@ Tick từng mục trước khi báo nhóm đã sẵn sàng demo. Các mục cầ
 
 ## Cần Tick Khi Lên Lớp
 
-Các mục này chỉ tick sau khi đã có Radmin Network/IP thật:
-
 ```text
-[ ] Máy demo chính đã cài Radmin VPN
-[ ] Đã join đúng Radmin Network của Product/cụm demo
-[ ] Đã ghi Radmin IP vào bảng chung
+[x] Máy demo chính đã cài Radmin VPN
+[x] Đã join đúng Radmin Network của Product/cụm demo
+[x] Đã ghi Radmin IP vào bảng chung
 [x] docker compose ps hiển thị container running
 [x] GET /health local thành công
-[ ] Nhóm đối tác gọi được /health qua Radmin IP
-[ ] .env đã dùng Radmin IP của nhóm đối tác
+[x] Nhóm đối tác gọi được /health qua Radmin IP
+[x] .env đã dùng Radmin IP của nhóm đối tác
+[x] Core health qua /partners/health ok=true
+[x] Analytics health qua /partners/health ok=true
 ```
 
 ## Endpoint Cần Test
@@ -53,13 +55,11 @@ docker compose logs --tail=80 mqtt-worker
 
 ## Lưu Ý Payload
 
-- Raw IoT input từ simulator/HiveMQ theo `IoTIngestion_README.md` dùng `snake_case`, ví dụ `event_id`, `device_id`, `temperature_c`.
-- Processed IoT event publish lên `smart-campus/events/sensor` cũng theo README, chủ yếu dùng `snake_case`.
-- Contract REST/OpenAPI events dùng `camelCase`, ví dụ `eventId`, `eventType`, `deviceId`, `sensorType`, `locationId`.
+- Raw IoT input từ simulator/HiveMQ dùng `snake_case`, ví dụ `event_id`, `device_id`, `temperature_c`.
+- Processed event gửi cho Core/Analytics dùng `camelCase`, ví dụ `eventId`, `eventType`, `deviceId`, `temperatureC`, `alertLevel`.
+- Không publish field `scenario_hint_for_teacher`.
 
 ## Minh Chứng Cần Lưu
-
-Lưu ảnh chụp/log vào `reports/`:
 
 - [ ] `reports/docker-compose-ps.png`
 - [ ] `reports/health-local.png`
@@ -82,30 +82,27 @@ Lưu ảnh chụp/log vào `reports/`:
 | Trình bày demo rõ ràng, đúng luồng tích hợp | 1.5 |
 | Tổng | 10.0 |
 
-Trọng tâm Buổi 6 là khả năng bắt tay thật giữa các service, không phải slide dài.
-
 ## Kết Quả Hiện Tại
 
 ```text
-Docker compose:
-- Đã từng chạy được với api, db, ai-service và mqtt-worker.
-- Cần chạy lại trên lớp sau khi Docker Desktop sẵn sàng.
+Radmin IP team-iot:
+- 26.7.138.126
 
 Local /health:
-- Đã từng trả status=ok.
-- Cần test lại ngay trước demo.
+- OK, status=ok.
 
 Partner /health:
-- Chưa tick vì cần Radmin IP thật của nhóm đối tác.
+- Core: ok=true, statusCode=200, url=http://26.183.48.228:8000/health
+- Analytics: ok=true, statusCode=200, url=http://26.169.171.221:8000/health
 
 IoT MQTT live:
-- Đã có log mqtt-worker xử lý raw IoT và publish processed event.
+- mqtt-worker đã nhận raw IoT và publish processed event lên smart-campus/events/sensor.
 
 Endpoint tích hợp chính:
-- Đã có reports/raw-demo-request.json.
-- Đã có reports/integration-request-response.txt.
+- reports/raw-demo-request.json
+- reports/integration-request-response.txt
 
 Timeout/failure handling:
-- REQUEST_TIMEOUT được đọc từ .env.
-- /partners/health trả lời có error/statusCode thay vì treo vô hạn khi partner lỗi.
+- REQUEST_TIMEOUT=5.
+- /partners/health trả error/statusCode thay vì treo vô hạn khi partner lỗi.
 ```

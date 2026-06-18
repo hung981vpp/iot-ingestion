@@ -63,6 +63,11 @@ def main() -> None:
             LOGGER.exception("invalid_json topic=%s", message.topic)
             return
 
+        LOGGER.info(
+            "raw_payload_json=%s",
+            json.dumps(payload, ensure_ascii=False, separators=(",", ":")),
+        )
+
         missing_fields = validate_raw_payload(payload)
         if missing_fields:
             LOGGER.error(
@@ -95,6 +100,10 @@ def main() -> None:
                 MQTT_SENSOR_OUTPUT_TOPIC,
                 processed.processed_event["eventId"],
                 processed.processed_event["status"],
+            )
+            LOGGER.info(
+                "processed_event_json=%s",
+                json.dumps(processed.processed_event, ensure_ascii=False, separators=(",", ":")),
             )
 
         if not MQTT_PUBLISH_CONTRACT_EVENTS:
