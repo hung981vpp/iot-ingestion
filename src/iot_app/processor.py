@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 
-SOURCE_SERVICE = "iot-ingestion"
+SOURCE_SERVICE = "a1-iot-ingestion"
 
 
 @dataclass(frozen=True)
@@ -127,6 +127,16 @@ def normalize_raw_payload(payload: Dict[str, Any]) -> tuple[Dict[str, Any], List
     return normalized, errors
 
 
+def has_sensor_value_error(errors: List[str], payload: Dict[str, Any]) -> bool:
+    sensor_error_fields = {
+        "invalid_temperature_c",
+        "invalid_humidity_percent",
+    }
+    return bool(sensor_error_fields.intersection(errors)) or (
+        payload.get("temperature_c") is None or payload.get("humidity_percent") is None
+    )
+
+
 def classify_raw_payload(payload: Dict[str, Any], device: Optional[DeviceRecord]) -> tuple[str, str, str]:
     if device is None:
         return "invalidDevice", "high", "deviceNotRegistered"
@@ -215,7 +225,7 @@ def build_processed_event(
     return {
         "eventId": f"sensor-event-{uuid4()}",
         "eventType": "sensor.reading.processed",
-        "sourceService": "team-iot",
+        "sourceService": SOURCE_SERVICE,
         "timestamp": payload["timestamp"],
         "rawEventId": payload.get("event_id"),
         "deviceId": payload["device_id"],
@@ -328,6 +338,33 @@ def process_raw_sample(payload: Dict[str, Any], registry: Dict[str, DeviceRecord
 
     normalized_payload, normalization_errors = normalize_raw_payload(payload)
     if normalization_errors:
+        sensor_value_error = (
+            "invalid_timestamp" not in normalization_errors
+            and "invalid_motion_detected" not in normalization_errors
+            and has_sensor_value_error(normalization_errors, normalized_payload)
+        )
+        if sensor_value_error:
+            device = registry.get(str(normalized_payload.get("device_id", "")))
+            reason = "missingSensorValue"
+            if any(error.startswith("invalid_") for error in normalization_errors):
+                reason = "invalidSensorValue"
+
+            return ProcessedRawSample(
+                raw_event_id=str(payload.get("event_id", "")),
+                device_id=str(payload.get("device_id", "")),
+                status="sensorError",
+                alert_level="medium",
+                reason=reason,
+                processed_event=build_processed_event(
+                    normalized_payload,
+                    status="sensorError",
+                    alert_level="medium",
+                    reason=reason,
+                    device=device,
+                ),
+                events=[],
+            )
+
         return ProcessedRawSample(
             raw_event_id=str(payload.get("event_id", "")),
             device_id=str(payload.get("device_id", "")),
